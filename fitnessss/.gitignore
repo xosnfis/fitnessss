@@ -1,0 +1,35 @@
+# Игнорируемые файлы
+
+# Конфигурация БД (может содержать пароли)
+config/database.local.php
+
+# Логи
+*.log
+logs/
+
+# Временные файлы
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Временные файлы PHP
+*.cache
+
+# Загрузки пользователей (если будут)
+uploads/
+
+# Node modules (если будут использоваться)
+node_modules/
+
+# Composer
+vendor/
+composer.lock
+

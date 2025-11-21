@@ -1,0 +1,132 @@
+/* Основные стили для сайта Фитнес-центр */
+body {
+    font-family: 'Times New Roman', serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    text-align: left;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.card {
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-title {
+    color: #333;
+    font-weight: bold;
+}
+
+.price {
+    color: #28a745;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.alert {
+    margin-top: 1rem;
+}
+
+.table {
+    font-size: 12pt;
+}
+
+.form-label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    margin-bottom: 1rem;
+}
+
+.cart-item {
+    border-bottom: 1px solid #ddd;
+    padding: 1rem 0;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.total-amount {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.admin-panel {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.trainer-card, .service-card, .subscription-card {
+    height: 100%;
+}
+
+.trainer-photo {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 0.25rem;
+}
+
+.badge-custom {
+    font-size: 0.85rem;
+    padding: 0.35em 0.65em;
+}
+
+.order-status {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+}
+
+.status-pending {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.status-confirmed {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.status-cancelled {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.status-completed {
+    background-color: #6c757d;
+    color: #fff;
+}
+
