@@ -53,45 +53,73 @@ include 'includes/header.php';
 ?>
 
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
+    <div class="col-md-8 col-lg-6">
+        <div class="card login-card fade-in-on-scroll">
             <div class="card-header">
-                <h2>Регистрация</h2>
+                <h2 class="mb-0">
+                    <i class="fas fa-user-plus me-2"></i>Регистрация
+                </h2>
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <?php if ($error): ?>
-                    <div class="alert alert-danger"><?php echo $error; ?></div>
+                    <div class="alert alert-danger fade-in-on-scroll">
+                        <i class="fas fa-exclamation-circle me-2"></i><?php echo $error; ?>
+                    </div>
                 <?php endif; ?>
                 <?php if ($success): ?>
-                    <div class="alert alert-success"><?php echo $success; ?></div>
+                    <div class="alert alert-success fade-in-on-scroll">
+                        <i class="fas fa-check-circle me-2"></i><?php echo $success; ?>
+                    </div>
                 <?php else: ?>
                     <form method="POST" action="">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Логин *</label>
-                            <input type="text" class="form-control" id="username" name="username" required value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">
+                                    <i class="fas fa-user me-1"></i>Логин *
+                                </label>
+                                <input type="text" class="form-control" id="username" name="username" required value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>" placeholder="Введите логин">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">
+                                    <i class="fas fa-envelope me-1"></i>Email *
+                                </label>
+                                <input type="email" class="form-control" id="email" name="email" required value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" placeholder="Введите email">
+                            </div>
                         </div>
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email *</label>
-                            <input type="email" class="form-control" id="email" name="email" required value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+                            <label for="full_name" class="form-label">
+                                <i class="fas fa-id-card me-1"></i>Полное имя *
+                            </label>
+                            <input type="text" class="form-control" id="full_name" name="full_name" required value="<?php echo htmlspecialchars($_POST['full_name'] ?? ''); ?>" placeholder="Введите полное имя">
                         </div>
                         <div class="mb-3">
-                            <label for="full_name" class="form-label">Полное имя *</label>
-                            <input type="text" class="form-control" id="full_name" name="full_name" required value="<?php echo htmlspecialchars($_POST['full_name'] ?? ''); ?>">
+                            <label for="phone" class="form-label">
+                                <i class="fas fa-phone me-1"></i>Телефон
+                            </label>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($_POST['phone'] ?? ''); ?>" placeholder="+7 (999) 123-45-67">
                         </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Телефон</label>
-                            <input type="tel" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($_POST['phone'] ?? ''); ?>">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">
+                                    <i class="fas fa-lock me-1"></i>Пароль *
+                                </label>
+                                <input type="password" class="form-control" id="password" name="password" required placeholder="Минимум 6 символов">
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label for="password_confirm" class="form-label">
+                                    <i class="fas fa-lock me-1"></i>Подтвердите пароль *
+                                </label>
+                                <input type="password" class="form-control" id="password_confirm" name="password_confirm" required placeholder="Повторите пароль">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Пароль *</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                        <button type="submit" class="btn btn-primary w-100 mb-3 py-2">
+                            <i class="fas fa-user-plus me-2"></i>Зарегистрироваться
+                        </button>
+                        <div class="text-center">
+                            <a href="login.php" class="text-decoration-none">
+                                <i class="fas fa-sign-in-alt me-1"></i>Уже есть аккаунт? Войти
+                            </a>
                         </div>
-                        <div class="mb-3">
-                            <label for="password_confirm" class="form-label">Подтвердите пароль *</label>
-                            <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
-                        <a href="login.php" class="btn btn-link">Уже есть аккаунт? Войти</a>
                     </form>
                 <?php endif; ?>
             </div>

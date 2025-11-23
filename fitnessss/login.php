@@ -46,31 +46,51 @@ include 'includes/header.php';
 ?>
 
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
+    <div class="col-md-6 col-lg-5">
+        <div class="card login-card fade-in-on-scroll">
             <div class="card-header">
-                <h2>Вход в систему</h2>
+                <h2 class="mb-0">
+                    <i class="fas fa-sign-in-alt me-2"></i>Вход в систему
+                </h2>
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <?php if ($error): ?>
-                    <div class="alert alert-danger"><?php echo $error; ?></div>
+                    <div class="alert alert-danger fade-in-on-scroll">
+                        <i class="fas fa-exclamation-circle me-2"></i><?php echo $error; ?>
+                    </div>
                 <?php endif; ?>
                 <form method="POST" action="">
                     <div class="mb-3">
-                        <label for="username" class="form-label">Логин или Email</label>
-                        <input type="text" class="form-control" id="username" name="username" required value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user me-2"></i>Логин или Email
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username" required value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>" placeholder="Введите логин или email">
                     </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Пароль</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock me-2"></i>Пароль
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password" required placeholder="Введите пароль">
                     </div>
-                    <button type="submit" class="btn btn-primary">Войти</button>
-                    <a href="register.php" class="btn btn-link">Нет аккаунта? Зарегистрироваться</a>
+                    <button type="submit" class="btn btn-primary w-100 mb-3 py-2">
+                        <i class="fas fa-sign-in-alt me-2"></i>Войти
+                    </button>
+                    <div class="text-center">
+                        <a href="register.php" class="text-decoration-none">
+                            <i class="fas fa-user-plus me-1"></i>Нет аккаунта? Зарегистрироваться
+                        </a>
+                    </div>
                 </form>
-                <hr>
-                <p class="text-muted small">Тестовые учетные данные:<br>
-                Админ: admin / password<br>
-                Пользователь: user1 / password</p>
+                <hr class="my-4">
+                <div class="bg-light p-3 rounded">
+                    <p class="text-muted small mb-2"><strong>Тестовые учетные данные:</strong></p>
+                    <p class="text-muted small mb-1">
+                        <i class="fas fa-user-shield me-1"></i>Админ: <code>admin</code> / <code>password</code>
+                    </p>
+                    <p class="text-muted small mb-0">
+                        <i class="fas fa-user me-1"></i>Пользователь: <code>user1</code> / <code>password</code>
+                    </p>
+                </div>
             </div>
         </div>
     </div>

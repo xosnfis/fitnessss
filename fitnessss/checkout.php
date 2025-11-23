@@ -86,17 +86,43 @@ include 'includes/header.php';
 <div class="row justify-content-center">
     <div class="col-md-8">
         <?php if ($error): ?>
-            <div class="alert alert-danger"><?php echo $error; ?></div>
-            <a href="cart.php" class="btn btn-primary">Вернуться в корзину</a>
-        <?php elseif ($success): ?>
-            <div class="alert alert-success">
-                <h4><?php echo $success; ?></h4>
-                <p>Вы можете просмотреть детали заказа в разделе <a href="orders.php">"Мои заказы"</a></p>
+            <div class="card fade-in-on-scroll">
+                <div class="card-body p-4 text-center">
+                    <div class="alert alert-danger fade-in-on-scroll">
+                        <i class="fas fa-exclamation-circle me-2"></i><?php echo $error; ?>
+                    </div>
+                    <a href="cart.php" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Вернуться в корзину
+                    </a>
+                </div>
             </div>
-            <a href="index.php" class="btn btn-primary">На главную</a>
-            <a href="orders.php" class="btn btn-secondary">Мои заказы</a>
+        <?php elseif ($success): ?>
+            <div class="card fade-in-on-scroll">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4" style="font-size: 4rem; color: var(--success-color);">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2 class="mb-3">Заказ успешно оформлен!</h2>
+                    <div class="alert alert-success fade-in-on-scroll mb-4">
+                        <h4 class="mb-2">
+                            <i class="fas fa-check-circle me-2"></i><?php echo $success; ?>
+                        </h4>
+                        <p class="mb-0">Вы можете просмотреть детали заказа в разделе <a href="orders.php" class="alert-link">"Мои заказы"</a></p>
+                    </div>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="index.php" class="btn btn-primary btn-lg">
+                            <i class="fas fa-home me-2"></i>На главную
+                        </a>
+                        <a href="orders.php" class="btn btn-success btn-lg">
+                            <i class="fas fa-list-alt me-2"></i>Мои заказы
+                        </a>
+                    </div>
+                </div>
+            </div>
         <?php else: ?>
-            <div class="alert alert-info">Перенаправление...</div>
+            <div class="alert alert-info fade-in-on-scroll">
+                <i class="fas fa-spinner fa-spin me-2"></i>Перенаправление...
+            </div>
             <script>window.location.href = 'cart.php';</script>
         <?php endif; ?>
     </div>

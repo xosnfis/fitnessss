@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = $is_edit ? 'Редактирование услуги' : 'Добавление услуги';
-include '../includes/header.php';
+include 'includes/header.php';
 ?>
 
 <h1><?php echo $is_edit ? 'Редактирование услуги' : 'Добавление услуги'; ?></h1>
@@ -152,5 +152,5 @@ include '../includes/header.php';
     </div>
 <?php endif; ?>
 
-<?php include '../includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>
 

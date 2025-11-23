@@ -2,7 +2,7 @@
 require_once '../config/config.php';
 requireAdmin();
 $pageTitle = 'Управление расписанием';
-include '../includes/header.php';
+include 'includes/header.php';
 
 $message = '';
 $error = '';
@@ -57,13 +57,19 @@ try {
 }
 ?>
 
-<h1>Редактирование расписания</h1>
+<h1 class="admin-page-title fade-in-on-scroll">
+    <i class="fas fa-calendar-alt"></i>Редактирование расписания
+</h1>
 
 <?php if ($message): ?>
-    <div class="alert alert-success"><?php echo $message; ?></div>
+    <div class="alert alert-success fade-in-on-scroll">
+        <i class="fas fa-check-circle me-2"></i><?php echo $message; ?>
+    </div>
 <?php endif; ?>
 <?php if ($error): ?>
-    <div class="alert alert-danger"><?php echo $error; ?></div>
+    <div class="alert alert-danger fade-in-on-scroll">
+        <i class="fas fa-exclamation-circle me-2"></i><?php echo $error; ?>
+    </div>
 <?php endif; ?>
 
 <div class="row">
@@ -114,5 +120,5 @@ try {
     </div>
 </div>
 
-<?php include '../includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>
 

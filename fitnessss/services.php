@@ -46,14 +46,20 @@ try {
 }
 ?>
 
-<h1>Услуги</h1>
+<h1 class="mb-4 fade-in-on-scroll">
+    <i class="fas fa-dumbbell text-primary me-2"></i>Услуги
+</h1>
 
-<div class="card mb-4">
-    <div class="card-body">
-        <h5>Фильтры</h5>
+<div class="card mb-5 fade-in-on-scroll filter-card">
+    <div class="card-body p-4">
+        <h5 class="mb-4">
+            <i class="fas fa-filter me-2"></i>Фильтры
+        </h5>
         <form method="GET" action="" class="row g-3">
             <div class="col-md-4">
-                <label for="category" class="form-label">Категория</label>
+                <label for="category" class="form-label">
+                    <i class="fas fa-tags me-1"></i>Категория
+                </label>
                 <select class="form-select" id="category" name="category">
                     <option value="">Все категории</option>
                     <?php foreach ($categories as $cat): ?>
@@ -64,7 +70,9 @@ try {
                 </select>
             </div>
             <div class="col-md-4">
-                <label for="trainer_id" class="form-label">Тренер</label>
+                <label for="trainer_id" class="form-label">
+                    <i class="fas fa-user-tie me-1"></i>Тренер
+                </label>
                 <select class="form-select" id="trainer_id" name="trainer_id">
                     <option value="">Все тренеры</option>
                     <?php foreach ($trainers as $trainer): ?>
@@ -74,11 +82,14 @@ try {
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-4">
-                <label class="form-label">&nbsp;</label>
-                <div>
-                    <button type="submit" class="btn btn-primary">Применить</button>
-                    <a href="services.php" class="btn btn-secondary">Сбросить</a>
+            <div class="col-md-4 d-flex align-items-end">
+                <div class="w-100">
+                    <button type="submit" class="btn btn-primary w-100 mb-2">
+                        <i class="fas fa-check me-2"></i>Применить
+                    </button>
+                    <a href="services.php" class="btn btn-secondary w-100">
+                        <i class="fas fa-redo me-2"></i>Сбросить
+                    </a>
                 </div>
             </div>
         </form>
@@ -88,38 +99,61 @@ try {
 <div class="row">
     <?php if (empty($services)): ?>
         <div class="col-12">
-            <div class="alert alert-info">Услуги не найдены</div>
+            <div class="alert alert-info fade-in-on-scroll">
+                <i class="fas fa-info-circle me-2"></i>Услуги не найдены
+            </div>
         </div>
     <?php else: ?>
-        <?php foreach ($services as $service): ?>
-            <div class="col-md-4 mb-4">
+        <?php foreach ($services as $index => $service): ?>
+            <div class="col-md-6 col-lg-4 mb-4 fade-in-on-scroll" style="animation-delay: <?php echo ($index % 3) * 0.1; ?>s;">
                 <div class="card service-card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo htmlspecialchars($service['name']); ?></h5>
-                        <p class="card-text"><?php echo htmlspecialchars($service['description']); ?></p>
-                        <p class="card-text">
-                            <small class="text-muted">
-                                Категория: <strong><?php echo htmlspecialchars($service['category']); ?></strong><br>
-                                <?php if ($service['trainer_name']): ?>
-                                    Тренер: <strong><?php echo htmlspecialchars($service['trainer_name']); ?></strong><br>
-                                <?php endif; ?>
-                                Длительность: <?php echo $service['duration']; ?> мин.<br>
-                                <?php if ($service['schedule']): ?>
-                                    Расписание: <?php echo htmlspecialchars($service['schedule']); ?><br>
-                                <?php endif; ?>
-                            </small>
-                        </p>
-                        <div class="price"><?php echo number_format($service['price'], 2, '.', ' '); ?> ₽</div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">
+                            <i class="fas fa-dumbbell text-primary me-2"></i>
+                            <?php echo htmlspecialchars($service['name']); ?>
+                        </h5>
+                        <p class="card-text flex-grow-1"><?php echo htmlspecialchars($service['description']); ?></p>
+                        <div class="mb-3">
+                            <p class="mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-tag me-1"></i>Категория: <strong><?php echo htmlspecialchars($service['category']); ?></strong>
+                                </small>
+                            </p>
+                            <?php if ($service['trainer_name']): ?>
+                                <p class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-user-tie me-1"></i>Тренер: <strong><?php echo htmlspecialchars($service['trainer_name']); ?></strong>
+                                    </small>
+                                </p>
+                            <?php endif; ?>
+                            <p class="mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>Длительность: <?php echo $service['duration']; ?> мин.
+                                </small>
+                            </p>
+                            <?php if ($service['schedule']): ?>
+                                <p class="mb-0">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt me-1"></i>Расписание: <?php echo htmlspecialchars($service['schedule']); ?>
+                                    </small>
+                                </p>
+                            <?php endif; ?>
+                        </div>
+                        <div class="price mb-3"><?php echo number_format($service['price'], 2, '.', ' '); ?> ₽</div>
                         <?php if (isLoggedIn()): ?>
-                            <button class="btn btn-primary mt-2" onclick="addToCart({
+                            <button class="btn btn-primary w-100" onclick="addToCart({
                                 type: 'service',
                                 id: <?php echo $service['id']; ?>,
                                 name: '<?php echo htmlspecialchars($service['name'], ENT_QUOTES); ?>',
                                 price: <?php echo $service['price']; ?>,
                                 quantity: 1
-                            })">Добавить в корзину</button>
+                            })">
+                                <i class="fas fa-cart-plus me-2"></i>Добавить в корзину
+                            </button>
                         <?php else: ?>
-                            <a href="login.php" class="btn btn-secondary mt-2">Войдите для покупки</a>
+                            <a href="login.php" class="btn btn-secondary w-100">
+                                <i class="fas fa-sign-in-alt me-2"></i>Войдите для покупки
+                            </a>
                         <?php endif; ?>
                     </div>
                 </div>

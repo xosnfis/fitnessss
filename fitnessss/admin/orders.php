@@ -2,7 +2,7 @@
 require_once '../config/config.php';
 requireAdmin();
 $pageTitle = 'Управление заказами';
-include '../includes/header.php';
+include 'includes/header.php';
 
 $message = '';
 $error = '';
@@ -39,13 +39,19 @@ try {
 }
 ?>
 
-<h1>Управление заказами</h1>
+<h1 class="admin-page-title fade-in-on-scroll">
+    <i class="fas fa-shopping-bag"></i>Управление заказами
+</h1>
 
 <?php if ($message): ?>
-    <div class="alert alert-success"><?php echo $message; ?></div>
+    <div class="alert alert-success fade-in-on-scroll">
+        <i class="fas fa-check-circle me-2"></i><?php echo $message; ?>
+    </div>
 <?php endif; ?>
 <?php if ($error): ?>
-    <div class="alert alert-danger"><?php echo $error; ?></div>
+    <div class="alert alert-danger fade-in-on-scroll">
+        <i class="fas fa-exclamation-circle me-2"></i><?php echo $error; ?>
+    </div>
 <?php endif; ?>
 
 <div class="table-responsive">
@@ -150,5 +156,5 @@ function showOrderDetails(orderId) {
 }
 </script>
 
-<?php include '../includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>
 

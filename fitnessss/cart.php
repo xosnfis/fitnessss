@@ -7,18 +7,31 @@ include 'includes/header.php';
 // Получение корзины из localStorage через JavaScript будет обрабатываться на клиенте
 ?>
 
-<h1>Корзина</h1>
+<h1 class="mb-4 fade-in-on-scroll">
+    <i class="fas fa-shopping-cart text-primary me-2"></i>Корзина
+</h1>
 
-<div id="cart-items">
-    <div class="alert alert-info">Загрузка корзины...</div>
+<div id="cart-items" class="fade-in-on-scroll">
+    <div class="alert alert-info">
+        <i class="fas fa-spinner fa-spin me-2"></i>Загрузка корзины...
+    </div>
 </div>
 
-<div id="cart-summary" class="card mt-4" style="display: none;">
-    <div class="card-body">
-        <h5>Итого: <span id="total-amount" class="total-amount">0 ₽</span></h5>
+<div id="cart-summary" class="card mt-4 fade-in-on-scroll" style="display: none;">
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0">Итого:</h5>
+            <h3 class="price mb-0" id="total-amount">0 ₽</h3>
+        </div>
         <form method="POST" action="checkout.php" id="checkout-form">
-            <button type="submit" class="btn btn-success btn-lg">Оформить заказ</button>
-            <button type="button" class="btn btn-secondary" onclick="clearCart(); location.reload();">Очистить корзину</button>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-success btn-lg py-3">
+                    <i class="fas fa-check-circle me-2"></i>Оформить заказ
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="clearCart(); location.reload();">
+                    <i class="fas fa-trash me-2"></i>Очистить корзину
+                </button>
+            </div>
         </form>
     </div>
 </div>
@@ -35,7 +48,15 @@ function loadCart() {
     const totalAmountSpan = document.getElementById('total-amount');
     
     if (cart.length === 0) {
-        cartItemsDiv.innerHTML = '<div class="alert alert-warning">Ваша корзина пуста</div>';
+        cartItemsDiv.innerHTML = `
+            <div class="alert alert-warning fade-in-on-scroll">
+                <i class="fas fa-shopping-cart me-2"></i>Ваша корзина пуста
+                <p class="mb-0 mt-2">
+                    <a href="services.php" class="alert-link">Посмотрите наши услуги</a> или 
+                    <a href="subscriptions.php" class="alert-link">выберите абонемент</a>
+                </p>
+            </div>
+        `;
         cartSummary.style.display = 'none';
         return;
     }
@@ -48,25 +69,32 @@ function loadCart() {
         total += subtotal;
         
         html += `
-            <div class="cart-item card mb-2">
-                <div class="card-body">
+            <div class="cart-item card mb-3 fade-in-on-scroll">
+                <div class="card-body p-4">
                     <div class="row align-items-center">
-                        <div class="col-md-6">
-                            <h5>${escapeHtml(item.name)}</h5>
-                            <p class="text-muted mb-0">Тип: ${item.type === 'service' ? 'Услуга' : 'Абонемент'}</p>
+                        <div class="col-md-5">
+                            <h5 class="mb-2">
+                                <i class="fas ${item.type === 'service' ? 'fa-dumbbell' : 'fa-id-card'} text-primary me-2"></i>
+                                ${escapeHtml(item.name)}
+                            </h5>
+                            <span class="badge ${item.type === 'service' ? 'bg-primary' : 'bg-success'}">
+                                ${item.type === 'service' ? 'Услуга' : 'Абонемент'}
+                            </span>
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Количество:</label>
+                        <div class="col-md-3">
+                            <label class="form-label mb-2">Количество:</label>
                             <input type="number" class="form-control" value="${item.quantity || 1}" min="1" 
-                                   onchange="updateQuantity(${index}, this.value)">
+                                   onchange="updateQuantity(${index}, this.value)" style="max-width: 100px;">
                         </div>
                         <div class="col-md-2 text-center">
-                            <strong>${formatPrice(subtotal)} ₽</strong><br>
+                            <div class="mb-2">
+                                <strong class="fs-5 text-primary">${formatPrice(subtotal)} ₽</strong>
+                            </div>
                             <small class="text-muted">${formatPrice(item.price)} ₽ за ед.</small>
                         </div>
                         <div class="col-md-2 text-end">
                             <button class="btn btn-danger btn-sm" onclick="removeFromCart('${item.type}', ${item.id})">
-                                Удалить
+                                <i class="fas fa-trash me-1"></i>Удалить
                             </button>
                         </div>
                     </div>
@@ -81,6 +109,12 @@ function loadCart() {
     
     // Сохранение данных корзины в скрытое поле формы для отправки на сервер
     const form = document.getElementById('checkout-form');
+    // Удаляем старое поле если есть
+    const oldInput = form.querySelector('input[name="cart_data"]');
+    if (oldInput) {
+        oldInput.remove();
+    }
+    // Создаем новое поле с актуальными данными
     const cartInput = document.createElement('input');
     cartInput.type = 'hidden';
     cartInput.name = 'cart_data';

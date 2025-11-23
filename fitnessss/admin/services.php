@@ -2,7 +2,7 @@
 require_once '../config/config.php';
 requireAdmin();
 $pageTitle = 'Управление услугами';
-include '../includes/header.php';
+include 'includes/header.php';
 
 $message = '';
 $error = '';
@@ -33,17 +33,25 @@ try {
 }
 ?>
 
-<h1>Управление услугами</h1>
+<h1 class="admin-page-title fade-in-on-scroll">
+    <i class="fas fa-dumbbell"></i>Управление услугами
+</h1>
 
 <?php if ($message): ?>
-    <div class="alert alert-success"><?php echo $message; ?></div>
+    <div class="alert alert-success fade-in-on-scroll">
+        <i class="fas fa-check-circle me-2"></i><?php echo $message; ?>
+    </div>
 <?php endif; ?>
 <?php if ($error): ?>
-    <div class="alert alert-danger"><?php echo $error; ?></div>
+    <div class="alert alert-danger fade-in-on-scroll">
+        <i class="fas fa-exclamation-circle me-2"></i><?php echo $error; ?>
+    </div>
 <?php endif; ?>
 
-<div class="mb-3">
-    <a href="service_edit.php" class="btn btn-success">+ Добавить услугу</a>
+<div class="mb-4 fade-in-on-scroll">
+    <a href="service_edit.php" class="btn btn-success">
+        <i class="fas fa-plus me-2"></i>Добавить услугу
+    </a>
 </div>
 
 <div class="table-responsive">
@@ -87,5 +95,5 @@ try {
     </table>
 </div>
 
-<?php include '../includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>
 
