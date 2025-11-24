@@ -66,9 +66,10 @@ try {
         exit;
     }
     
-    // Обновляем статус оплаты заказа и статус заказа на "оплачено"
-    $stmt = $pdo->prepare("UPDATE orders SET payment_status = 'paid', status = 'paid', payment_method = 'card', notes = ? WHERE id = ?");
-    $notes = "Оплата картой: " . substr($card_number_clean, -4) . ", ФИО: $full_name, Email: $email, Телефон: $phone";
+    // Обновляем статус оплаты заказа и статус заказа на "подтвержден" (оплачено)
+    $stmt = $pdo->prepare("UPDATE orders SET payment_status = 'paid', status = 'confirmed', payment_method = 'card', notes = ? WHERE id = ?");
+    // Сохраняем только последние 4 цифры карты, не полные данные
+    $notes = "Оплата картой: ****" . substr($card_number_clean, -4) . ", ФИО: $full_name, Email: $email, Телефон: $phone";
     if ($address) {
         $notes .= ", Адрес: $address";
     }
@@ -78,6 +79,43 @@ try {
         $pdo->rollBack();
         echo json_encode(['success' => false, 'message' => 'Ошибка при обновлении статуса заказа']);
         exit;
+    }
+    
+    // Получаем элементы заказа для создания подписок (если есть абонементы)
+    $stmt = $pdo->prepare("SELECT * FROM order_items WHERE order_id = ? AND item_type = 'subscription'");
+    $stmt->execute([$order_id]);
+    $subscription_items = $stmt->fetchAll();
+    
+    // Создаем подписки для каждого купленного абонемента (только после оплаты)
+    foreach ($subscription_items as $item) {
+        // Проверяем, не создана ли уже подписка для этого заказа
+        $stmt_check = $pdo->prepare("SELECT id FROM user_subscriptions WHERE order_id = ? AND subscription_id = ?");
+        $stmt_check->execute([$order_id, $item['item_id']]);
+        $existing = $stmt_check->fetch();
+        
+        if (!$existing) {
+            // Получаем информацию об абонементе
+            $stmt_sub = $pdo->prepare("SELECT duration_days FROM subscriptions WHERE id = ?");
+            $stmt_sub->execute([$item['item_id']]);
+            $sub = $stmt_sub->fetch();
+            
+            if ($sub) {
+                $start_date = date('Y-m-d');
+                $end_date = date('Y-m-d', strtotime("+{$sub['duration_days']} days"));
+                
+                // Создаем подписку для каждого купленного абонемента (с учетом quantity)
+                for ($i = 0; $i < $item['quantity']; $i++) {
+                    $stmt_usr = $pdo->prepare("INSERT INTO user_subscriptions (user_id, subscription_id, order_id, start_date, end_date, is_active) VALUES (?, ?, ?, ?, ?, TRUE)");
+                    $stmt_usr->execute([
+                        $_SESSION['user_id'],
+                        $item['item_id'],
+                        $order_id,
+                        $start_date,
+                        $end_date
+                    ]);
+                }
+            }
+        }
     }
     
     $pdo->commit();

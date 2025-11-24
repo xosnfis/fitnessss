@@ -65,9 +65,45 @@
                 </ul>
                 <ul class="navbar-nav">
                     <?php if (isLoggedIn()): ?>
+                        <?php
+                        // Получаем актуальные данные пользователя из БД (включая username)
+                        $current_username = $_SESSION['username'] ?? '';
+                        $active_subscription = null;
+                        try {
+                            $pdo = getDBConnection();
+                            // Получаем актуальный username из БД
+                            $stmt = $pdo->prepare("SELECT username FROM users WHERE id = ?");
+                            $stmt->execute([$_SESSION['user_id']]);
+                            $user_data = $stmt->fetch();
+                            if ($user_data) {
+                                $current_username = $user_data['username'];
+                                // Обновляем сессию, если username изменился
+                                if ($_SESSION['username'] !== $current_username) {
+                                    $_SESSION['username'] = $current_username;
+                                }
+                            }
+                            
+                            // Получаем активную подписку пользователя
+                            $stmt = $pdo->prepare("SELECT us.*, s.name as subscription_name 
+                                                  FROM user_subscriptions us 
+                                                  INNER JOIN subscriptions s ON us.subscription_id = s.id 
+                                                  WHERE us.user_id = ? AND us.is_active = 1 AND us.end_date >= CURDATE() 
+                                                  ORDER BY us.end_date DESC 
+                                                  LIMIT 1");
+                            $stmt->execute([$_SESSION['user_id']]);
+                            $active_subscription = $stmt->fetch();
+                        } catch (PDOException $e) {
+                            error_log("User data fetch error: " . $e->getMessage());
+                        }
+                        ?>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user me-1"></i><?php echo htmlspecialchars($_SESSION['username']); ?>
+                                <i class="fas fa-user me-1"></i><?php echo htmlspecialchars($current_username); ?>
+                                <?php if ($active_subscription): ?>
+                                    <span class="badge bg-success ms-2" title="Активная подписка: <?php echo htmlspecialchars($active_subscription['subscription_name']); ?> до <?php echo date('d.m.Y', strtotime($active_subscription['end_date'])); ?>">
+                                        <i class="fas fa-id-card me-1"></i><?php echo htmlspecialchars($active_subscription['subscription_name']); ?>
+                                    </span>
+                                <?php endif; ?>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user-circle me-2"></i>Профиль</a></li>

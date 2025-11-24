@@ -72,14 +72,15 @@ body {
     font-size: 1.5rem;
     color: #FFFFFF !important;
     text-decoration: none;
-    transition: transform var(--transition-base);
+    transition: opacity var(--transition-base), filter var(--transition-base);
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
 }
 
 .navbar-brand:hover {
-    transform: scale(1.05);
+    opacity: 0.9;
+    filter: brightness(1.1);
     color: #FFFFFF !important;
 }
 
@@ -99,21 +100,24 @@ body {
     position: absolute;
     bottom: 0;
     left: 50%;
-    transform: translateX(-50%) scaleX(0);
+    margin-left: -40%;
     width: 80%;
     height: 2px;
     background: var(--primary-color);
-    transition: transform var(--transition-base);
+    transition: opacity var(--transition-base), width var(--transition-base);
+    opacity: 0;
+    width: 0;
 }
 
 .navbar-nav .nav-link:hover::before {
-    transform: translateX(-50%) scaleX(1);
+    opacity: 1;
+    width: 80%;
 }
 
 .navbar-nav .nav-link:hover {
     color: #FFFFFF !important;
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-toggler {
@@ -144,7 +148,8 @@ body {
 .dropdown-item:hover {
     background: var(--gradient-primary);
     color: #FFFFFF;
-    transform: translateX(5px);
+    padding-left: 2rem;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
 
@@ -230,11 +235,11 @@ body {
     border: none;
     border-radius: 16px;
     box-shadow: var(--shadow-md);
-    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
     overflow: hidden;
     background: #FFFFFF;
     margin-bottom: 2rem;
-    will-change: transform;
+    border: 2px solid transparent;
     /* Анимация только для элементов с классом fade-in-on-scroll */
 }
 
@@ -246,33 +251,34 @@ body {
     width: 100%;
     height: 4px;
     background: var(--gradient-primary);
-    transform: scaleX(0);
-    transition: transform var(--transition-base);
+    transition: opacity var(--transition-base), width var(--transition-base);
+    opacity: 0;
+    width: 0;
 }
 
 .card:hover::before {
-    transform: scaleX(1);
+    opacity: 1;
+    width: 100%;
 }
 
 .card:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-color);
 }
 
 /* Отключение анимации для карточек корзины */
 .cart-item.card:hover {
-    transform: none;
     box-shadow: var(--shadow-md);
 }
 
 /* Блок фильтров - более тонкие эффекты (без агрессивного зума) */
 .card.filter-card {
-    transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+    transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
 }
 
 .card.filter-card:hover {
-    transform: translateY(-2px) scale(1.01);
     box-shadow: var(--shadow-lg);
+    border-color: var(--primary-color);
 }
 
 .card.filter-card::before {
@@ -320,12 +326,12 @@ body {
 
 .accordion-button::after {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-    transition: transform var(--transition-base);
+    transition: opacity var(--transition-base), filter var(--transition-base);
 }
 
 .accordion-button:not(.collapsed)::after {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-    transform: rotate(180deg);
+    filter: invert(1);
 }
 
 .accordion-body {
@@ -547,11 +553,12 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
+    margin-top: -150px;
+    margin-left: -150px;
     width: 0;
     height: 0;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.2);
-    transform: translate(-50%, -50%);
     transition: width 0.6s ease, height 0.6s ease;
     z-index: 0;
 }
@@ -568,8 +575,8 @@ body {
 }
 
 .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-xl);
+    filter: brightness(1.1);
     color: #FFFFFF;
 }
 
@@ -581,7 +588,8 @@ body {
 .btn-secondary:hover {
     background: var(--text-dark);
     color: #FFFFFF;
-    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    filter: brightness(1.1);
 }
 
 .btn-success {
@@ -592,8 +600,8 @@ body {
 
 .btn-success:hover {
     background: #048A68;
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-xl);
+    filter: brightness(1.1);
     color: #FFFFFF;
 }
 
@@ -606,7 +614,8 @@ body {
 .btn-light:hover {
     background: var(--primary-color);
     color: #FFFFFF;
-    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    filter: brightness(1.1);
 }
 
 /* Кнопка регистрации */
@@ -647,10 +656,10 @@ body {
 
 .btn-register:hover {
     background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(255, 255, 255, 0.9);
     color: #FFFFFF !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    filter: brightness(1.1);
 }
 
 .btn-register:hover::before {
@@ -736,8 +745,8 @@ body {
 
 .list-group-item:hover {
     background: var(--light-color);
-    transform: translateX(5px);
     padding-left: 2rem;
+    border-left: 3px solid var(--primary-color);
 }
 
 /* ========== Таблицы ========== */
@@ -758,7 +767,7 @@ body {
 
 .table tbody tr:hover {
     background: var(--light-color);
-    transform: scale(1.01);
+    box-shadow: inset 0 0 0 2px var(--primary-color);
 }
 
 /* ========== Футер ========== */
@@ -820,12 +829,12 @@ footer h5:hover {
 }
 
 footer .fab, footer .fas {
-    transition: color var(--transition-base), transform var(--transition-base);
+    transition: color var(--transition-base), filter var(--transition-base);
 }
 
 footer .fab:hover, footer .fas:hover {
     color: var(--orange) !important;
-    transform: scale(1.15);
+    filter: brightness(1.3) drop-shadow(0 0 4px rgba(255, 107, 53, 0.5));
 }
 
 /* Подсветка всех текстовых элементов в футере */
@@ -959,11 +968,12 @@ footer .footer-hover:hover {
     height: 250px;
     object-fit: cover;
     border-radius: 12px;
-    transition: transform var(--transition-base);
+    transition: filter var(--transition-base), box-shadow var(--transition-base);
 }
 
 .card:hover .trainer-photo {
-    transform: scale(1.01);
+    filter: brightness(1.05) contrast(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* ========== Анимации ========== */

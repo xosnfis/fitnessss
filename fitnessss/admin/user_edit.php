@@ -56,6 +56,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, full_name = ?, phone = ?, role = ? WHERE id = ?");
                         $stmt->execute([$username, $email, $full_name, $phone, $role, $id]);
                     }
+                    
+                    // Если обновляем данные текущего пользователя, обновляем сессию
+                    if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $id) {
+                        $_SESSION['username'] = $username;
+                        $_SESSION['role'] = $role;
+                        $_SESSION['full_name'] = $full_name;
+                        if (isset($_SESSION['email'])) {
+                            $_SESSION['email'] = $email;
+                        }
+                    }
+                    
                     $message = 'Пользователь успешно обновлен';
                 } else {
                     // Создание

@@ -37,8 +37,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Эффект для навигации при прокрутке (отложено)
         initNavbarScroll();
         
-        // Анимация для карточек (отложено)
-        initCardAnimations();
+        // Анимация для карточек отключена - удаляем все 3D эффекты
+        removeCard3DEffects();
     }, { timeout: 100 });
 });
 
@@ -293,46 +293,54 @@ function initSmoothScroll() {
     });
 }
 
-// Анимация для карточек - оптимизирована (упрощен параллакс для производительности)
-function initCardAnimations() {
-    // Исключаем фильтры и другие специальные карточки из параллакс-эффекта
-    const cards = document.querySelectorAll('.card:not(.filter-card):not(.login-card):not(.register-card)');
+// Удаление всех 3D эффектов с карточек
+function removeCard3DEffects() {
+    // Добавляем CSS правило, которое блокирует все transform на карточках
+    const style = document.createElement('style');
+    style.textContent = `
+        .card {
+            transform: none !important;
+            perspective: none !important;
+        }
+        .card * {
+            transform: none !important;
+        }
+    `;
+    document.head.appendChild(style);
     
-    // Используем делегирование событий для лучшей производительности
-    cards.forEach(card => {
-        let isHovering = false;
-        
-        card.addEventListener('mouseenter', function() {
-            isHovering = true;
-        }, { passive: true });
-        
-        // Упрощенный параллакс - только при движении мыши
-        card.addEventListener('mousemove', function(e) {
-            if (!isHovering) return;
-            
-            requestAnimationFrame(() => {
-                const rect = this.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                // Упрощенный расчет для лучшей производительности
-                const rotateX = (y - centerY) / 25;
-                const rotateY = (centerX - x) / 25;
-                
-                this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
-            });
-        }, { passive: true });
-        
-        card.addEventListener('mouseleave', function() {
-            isHovering = false;
-            requestAnimationFrame(() => {
-                this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
-            });
-        }, { passive: true });
-    });
+    // Удаляем все inline transform стили с карточек
+    const removeTransforms = () => {
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            if (card.style.transform && card.style.transform.includes('perspective')) {
+                card.style.transform = '';
+            }
+            if (card.style.perspective) {
+                card.style.perspective = '';
+            }
+        });
+    };
+    
+    // Удаляем сразу
+    removeTransforms();
+    
+    // Удаляем периодически на случай, если что-то пытается их применить
+    setInterval(removeTransforms, 100);
+    
+    // Удаляем при любом движении мыши
+    document.addEventListener('mousemove', function(e) {
+        const card = e.target.closest('.card');
+        if (card) {
+            if (card.style.transform && card.style.transform.includes('perspective')) {
+                card.style.transform = '';
+            }
+        }
+    }, { passive: true });
+}
+
+// Старая функция - больше не используется
+function initCardAnimations() {
+    // Функция отключена
 }
 
 // Валидация форм
