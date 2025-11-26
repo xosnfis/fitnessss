@@ -86,6 +86,26 @@ try {
     $stmt->execute([$order_id]);
     $subscription_items = $stmt->fetchAll();
     
+    // Если в заказе есть абонементы, проверяем наличие активного абонемента
+    if (!empty($subscription_items)) {
+        $stmt_check = $pdo->prepare("SELECT id FROM user_subscriptions 
+                                     WHERE user_id = ? 
+                                     AND is_active = TRUE 
+                                     AND end_date >= CURDATE()
+                                     LIMIT 1");
+        $stmt_check->execute([$_SESSION['user_id']]);
+        $active_subscription = $stmt_check->fetch();
+        
+        if ($active_subscription) {
+            $pdo->rollBack();
+            echo json_encode([
+                'success' => false, 
+                'message' => 'У вас уже есть активный абонемент. Один пользователь может иметь только один активный абонемент.'
+            ]);
+            exit;
+        }
+    }
+    
     // Создаем подписки для каждого купленного абонемента (только после оплаты)
     foreach ($subscription_items as $item) {
         // Проверяем, не создана ли уже подписка для этого заказа

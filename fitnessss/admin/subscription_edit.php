@@ -35,19 +35,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Заполните все обязательные поля';
     } else {
         try {
+            // Проверяем, не существует ли уже абонемент с таким именем (кроме текущего при редактировании)
+            $check_stmt = $pdo->prepare("SELECT id FROM subscriptions WHERE name = ?" . ($is_edit ? " AND id != ?" : ""));
             if ($is_edit) {
-                $stmt = $pdo->prepare("UPDATE subscriptions SET name = ?, description = ?, price = ?, duration_days = ?, visits_count = ?, services_included = ?, is_active = ? WHERE id = ?");
-                $stmt->execute([$name, $description, $price, $duration_days, $visits_count, $services_included, $is_active, $id]);
-                $message = 'Абонемент успешно обновлен';
+                $check_stmt->execute([$name, $id]);
             } else {
-                $stmt = $pdo->prepare("INSERT INTO subscriptions (name, description, price, duration_days, visits_count, services_included, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$name, $description, $price, $duration_days, $visits_count, $services_included, $is_active]);
-                $message = 'Абонемент успешно создан';
-                $is_edit = true;
-                $id = $pdo->lastInsertId();
+                $check_stmt->execute([$name]);
+            }
+            if ($check_stmt->fetch()) {
+                $error = 'Абонемент с таким названием уже существует';
+            } else {
+                if ($is_edit) {
+                    $stmt = $pdo->prepare("UPDATE subscriptions SET name = ?, description = ?, price = ?, duration_days = ?, visits_count = ?, services_included = ?, is_active = ? WHERE id = ?");
+                    $stmt->execute([$name, $description, $price, $duration_days, $visits_count, $services_included, $is_active, $id]);
+                    $message = 'Абонемент успешно обновлен';
+                } else {
+                    // Случайный рейтинг от 1 до 5 для нового абонемента
+                    $rating = rand(1, 5);
+                    $stmt = $pdo->prepare("INSERT INTO subscriptions (name, description, price, duration_days, visits_count, services_included, is_active, rating) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([$name, $description, $price, $duration_days, $visits_count, $services_included, $is_active, $rating]);
+                    $message = 'Абонемент успешно создан';
+                    $is_edit = true;
+                    $id = $pdo->lastInsertId();
+                }
             }
         } catch (PDOException $e) {
-            $error = 'Ошибка при сохранении абонемента';
+            // Проверяем, не ошибка ли это дубликата уникального ключа
+            if ($e->getCode() == 23000 || strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                $error = 'Абонемент с таким названием уже существует';
+            } else {
+                $error = 'Ошибка при сохранении абонемента';
+            }
             error_log("Subscription edit error: " . $e->getMessage());
         }
     }

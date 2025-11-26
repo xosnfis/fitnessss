@@ -82,6 +82,87 @@ include 'includes/header.php';
     </div>
 </div>
 
+<?php
+// Получаем активные сертификаты
+try {
+    $pdo = getDBConnection();
+    $stmt = $pdo->query("SELECT * FROM certificates WHERE is_active = 1 ORDER BY display_order ASC, created_at DESC");
+    $certificates = $stmt->fetchAll();
+    
+    if (!empty($certificates)):
+?>
+    <h2 class="mt-5 mb-4 text-center fade-in-on-scroll">
+        <i class="fas fa-certificate text-primary me-2"></i>Наши сертификаты
+    </h2>
+    <div class="row mb-5 fade-in-on-scroll">
+        <?php foreach ($certificates as $cert): ?>
+            <div class="col-md-4 col-lg-3 mb-4">
+                <div class="card h-100 certificate-card" style="cursor: pointer; transition: transform 0.3s ease;" 
+                     onclick="openCertificateModal('<?php echo htmlspecialchars($cert['image_path'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($cert['title'], ENT_QUOTES); ?>')">
+                    <div class="card-img-top position-relative" style="height: 250px; overflow: hidden; background: #f8f9fa;">
+                        <img src="<?php echo htmlspecialchars($cert['image_path']); ?>" 
+                             alt="<?php echo htmlspecialchars($cert['title']); ?>"
+                             class="w-100 h-100" 
+                             style="object-fit: cover;">
+                        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" 
+                             style="background: rgba(0,0,0,0); transition: background 0.3s ease;">
+                            <i class="fas fa-search-plus text-white" style="font-size: 2rem; opacity: 0; transition: opacity 0.3s ease;"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title mb-1"><?php echo htmlspecialchars($cert['title']); ?></h6>
+                        <?php if ($cert['description']): ?>
+                            <p class="card-text small text-muted mb-0"><?php echo htmlspecialchars(mb_substr($cert['description'], 0, 60)); ?><?php echo mb_strlen($cert['description']) > 60 ? '...' : ''; ?></p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    
+    <!-- Модальное окно для просмотра сертификата -->
+    <div class="modal fade" id="certificateModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="certificateModalTitle"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-0">
+                    <img id="certificateModalImg" src="" alt="" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .certificate-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .certificate-card:hover .card-img-top > div {
+            background: rgba(0,0,0,0.5) !important;
+        }
+        .certificate-card:hover .card-img-top i {
+            opacity: 1 !important;
+        }
+    </style>
+    
+    <script>
+    function openCertificateModal(imagePath, title) {
+        document.getElementById('certificateModalImg').src = imagePath;
+        document.getElementById('certificateModalTitle').textContent = title;
+        const modal = new bootstrap.Modal(document.getElementById('certificateModal'));
+        modal.show();
+    }
+    </script>
+<?php
+    endif;
+} catch (PDOException $e) {
+    error_log("Certificates display error: " . $e->getMessage());
+}
+?>
+
 <?php include 'includes/footer.php'; ?>
 
 

@@ -24,59 +24,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $pdo = getDBConnection();
-            $pdo->beginTransaction();
             
-            // Расчет общей суммы
-            $total_amount = 0;
+            // Проверяем, есть ли в корзине абонемент
+            $has_subscription = false;
             foreach ($cart as $item) {
-                $total_amount += ($item['price'] ?? 0) * ($item['quantity'] ?? 1);
+                if (isset($item['type']) && $item['type'] === 'subscription') {
+                    $has_subscription = true;
+                    break;
+                }
             }
             
-            // Создание заказа
-            $stmt = $pdo->prepare("INSERT INTO orders (user_id, total_amount, status, payment_status) VALUES (?, ?, 'pending', 'unpaid')");
-            $stmt->execute([$_SESSION['user_id'], $total_amount]);
-            $order_id = $pdo->lastInsertId();
-            
-            // Добавление элементов заказа
-            foreach ($cart as $item) {
-                $quantity = $item['quantity'] ?? 1;
-                $price = $item['price'] ?? 0;
-                $subtotal = $price * $quantity;
+            // Если в корзине есть абонемент, проверяем наличие активного абонемента
+            if ($has_subscription) {
+                $stmt = $pdo->prepare("SELECT id FROM user_subscriptions 
+                                       WHERE user_id = ? 
+                                       AND is_active = TRUE 
+                                       AND end_date >= CURDATE()
+                                       LIMIT 1");
+                $stmt->execute([$_SESSION['user_id']]);
+                $active_subscription = $stmt->fetch();
                 
-                $stmt = $pdo->prepare("INSERT INTO order_items (order_id, item_type, item_id, quantity, price, subtotal) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->execute([
-                    $order_id,
-                    $item['type'],
-                    $item['id'],
-                    $quantity,
-                    $price,
-                    $subtotal
-                ]);
+                if ($active_subscription) {
+                    $error = 'У вас уже есть активный абонемент. Один пользователь может иметь только один активный абонемент.';
+                }
             }
             
-            $pdo->commit();
-            
-            // Получаем данные заказа для отображения
-            $stmt = $pdo->prepare("SELECT o.*, 
-                (SELECT GROUP_CONCAT(CONCAT(oi.quantity, 'x ', 
-                    CASE 
-                        WHEN oi.item_type = 'service' THEN s.name 
-                        WHEN oi.item_type = 'subscription' THEN sub.name 
-                    END
-                ) SEPARATOR ', ')
-                FROM order_items oi
-                LEFT JOIN services s ON oi.item_type = 'service' AND oi.item_id = s.id
-                LEFT JOIN subscriptions sub ON oi.item_type = 'subscription' AND oi.item_id = sub.id
-                WHERE oi.order_id = o.id) as items_info
-                FROM orders o WHERE o.id = ?");
-            $stmt->execute([$order_id]);
-            $order_data = $stmt->fetch();
-            
-            // Очистка корзины
-            echo '<script>localStorage.removeItem("cart");</script>';
+            if ($error) {
+                // Если есть ошибка, не создаем заказ
+            } else {
+                $pdo->beginTransaction();
+                
+                // Расчет общей суммы
+                $total_amount = 0;
+                foreach ($cart as $item) {
+                    $total_amount += ($item['price'] ?? 0) * ($item['quantity'] ?? 1);
+                }
+                
+                // Создание заказа
+                $stmt = $pdo->prepare("INSERT INTO orders (user_id, total_amount, status, payment_status) VALUES (?, ?, 'pending', 'unpaid')");
+                $stmt->execute([$_SESSION['user_id'], $total_amount]);
+                $order_id = $pdo->lastInsertId();
+                
+                // Добавление элементов заказа
+                foreach ($cart as $item) {
+                    $quantity = $item['quantity'] ?? 1;
+                    $price = $item['price'] ?? 0;
+                    $subtotal = $price * $quantity;
+                    
+                    $stmt = $pdo->prepare("INSERT INTO order_items (order_id, item_type, item_id, quantity, price, subtotal) VALUES (?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([
+                        $order_id,
+                        $item['type'],
+                        $item['id'],
+                        $quantity,
+                        $price,
+                        $subtotal
+                    ]);
+                }
+                
+                $pdo->commit();
+                
+                // Получаем данные заказа для отображения
+                $stmt = $pdo->prepare("SELECT o.*, 
+                    (SELECT GROUP_CONCAT(CONCAT(oi.quantity, 'x ', 
+                        CASE 
+                            WHEN oi.item_type = 'service' THEN s.name 
+                            WHEN oi.item_type = 'subscription' THEN sub.name 
+                        END
+                    ) SEPARATOR ', ')
+                    FROM order_items oi
+                    LEFT JOIN services s ON oi.item_type = 'service' AND oi.item_id = s.id
+                    LEFT JOIN subscriptions sub ON oi.item_type = 'subscription' AND oi.item_id = sub.id
+                    WHERE oi.order_id = o.id) as items_info
+                    FROM orders o WHERE o.id = ?");
+                $stmt->execute([$order_id]);
+                $order_data = $stmt->fetch();
+                
+                // Очистка корзины
+                echo '<script>localStorage.removeItem("cart");</script>';
+            }
             
         } catch (PDOException $e) {
-            $pdo->rollBack();
+            if (isset($pdo) && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
             $error = 'Ошибка при оформлении заказа. Попробуйте позже.';
             error_log("Checkout error: " . $e->getMessage());
         }

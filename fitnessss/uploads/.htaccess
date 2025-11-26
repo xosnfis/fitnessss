@@ -1,0 +1,16 @@
+# Защита папки uploads
+# Разрешаем доступ только к файлам изображений
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|jfif)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Запрещаем выполнение PHP файлов в этой папке
+<FilesMatch "\.php$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Запрещаем листинг директории
+Options -Indexes
+

@@ -31,6 +31,23 @@ try {
     $stmt->execute($params);
     $services = $stmt->fetchAll();
     
+    // Устанавливаем случайный рейтинг для записей без рейтинга
+    foreach ($services as &$service) {
+        if (!isset($service['rating']) || empty($service['rating']) || $service['rating'] == 0) {
+            $rating = rand(1, 5);
+            $service['rating'] = $rating;
+            // Сохраняем рейтинг в БД (если поле существует)
+            try {
+                $update_stmt = $pdo->prepare("UPDATE services SET rating = ? WHERE id = ?");
+                $update_stmt->execute([$rating, $service['id']]);
+            } catch (PDOException $e) {
+                // Поле rating может еще не существовать - это нормально
+                error_log("Rating field might not exist: " . $e->getMessage());
+            }
+        }
+    }
+    unset($service);
+    
     // Получение категорий для фильтра
     $stmt = $pdo->query("SELECT DISTINCT category FROM services WHERE is_active = 1 ORDER BY category");
     $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -112,6 +129,21 @@ try {
                             <i class="fas fa-dumbbell text-primary me-2"></i>
                             <?php echo htmlspecialchars($service['name']); ?>
                         </h5>
+                        <!-- Отображение звезд рейтинга -->
+                        <?php 
+                        $rating = isset($service['rating']) && $service['rating'] > 0 ? (int)$service['rating'] : 0;
+                        if ($rating > 0):
+                        ?>
+                        <div class="mb-2 rating-stars">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <?php if ($i <= $rating): ?>
+                                    <span class="star star-filled">⭐</span>
+                                <?php else: ?>
+                                    <span class="star star-empty">☆</span>
+                                <?php endif; ?>
+                            <?php endfor; ?>
+                        </div>
+                        <?php endif; ?>
                         <p class="card-text flex-grow-1"><?php echo htmlspecialchars($service['description']); ?></p>
                         <div class="mb-3">
                             <p class="mb-2">
@@ -161,6 +193,36 @@ try {
         <?php endforeach; ?>
     <?php endif; ?>
 </div>
+
+<style>
+.rating-stars {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+}
+
+.rating-stars .star {
+    font-size: 20px;
+    line-height: 1;
+    display: inline-block;
+    transition: transform 0.2s ease;
+    user-select: none;
+}
+
+.rating-stars .star:hover {
+    transform: scale(1.2);
+}
+
+.rating-stars .star-filled {
+    color: #FFD700; /* Золотой цвет для заполненных звезд */
+    filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.5));
+}
+
+.rating-stars .star-empty {
+    color: #CCCCCC; /* Серый цвет для пустых звезд */
+    opacity: 0.4;
+}
+</style>
 
 <?php include 'includes/footer.php'; ?>
 

@@ -71,6 +71,32 @@ function updateCartCount() {
 
 // Добавление товара в корзину с анимацией
 function addToCart(item) {
+    // Если добавляется абонемент, проверяем наличие активного абонемента
+    if (item.type === 'subscription') {
+        // Проверяем наличие активного абонемента через API
+        fetch('api/check_active_subscription.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.has_active) {
+                    showNotification('У вас уже есть активный абонемент. Один пользователь может иметь только один активный абонемент.', 'error');
+                    return;
+                }
+                // Если активного абонемента нет, добавляем в корзину
+                addToCartInternal(item);
+            })
+            .catch(error => {
+                console.error('Error checking subscription:', error);
+                // В случае ошибки все равно пытаемся добавить, но проверка будет на сервере
+                addToCartInternal(item);
+            });
+    } else {
+        // Для услуг просто добавляем в корзину
+        addToCartInternal(item);
+    }
+}
+
+// Внутренняя функция добавления в корзину
+function addToCartInternal(item) {
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
     
     // Проверяем, есть ли уже такой товар в корзине

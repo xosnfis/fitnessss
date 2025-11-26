@@ -41,19 +41,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Заполните все обязательные поля';
     } else {
         try {
+            // Проверяем, не существует ли уже услуга с таким именем (кроме текущей при редактировании)
+            $check_stmt = $pdo->prepare("SELECT id FROM services WHERE name = ?" . ($is_edit ? " AND id != ?" : ""));
             if ($is_edit) {
-                $stmt = $pdo->prepare("UPDATE services SET name = ?, description = ?, price = ?, duration = ?, category = ?, trainer_id = ?, schedule = ?, max_participants = ?, is_active = ? WHERE id = ?");
-                $stmt->execute([$name, $description, $price, $duration, $category, $trainer_id, $schedule, $max_participants, $is_active, $id]);
-                $message = 'Услуга успешно обновлена';
+                $check_stmt->execute([$name, $id]);
             } else {
-                $stmt = $pdo->prepare("INSERT INTO services (name, description, price, duration, category, trainer_id, schedule, max_participants, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$name, $description, $price, $duration, $category, $trainer_id, $schedule, $max_participants, $is_active]);
-                $message = 'Услуга успешно создана';
-                $is_edit = true;
-                $id = $pdo->lastInsertId();
+                $check_stmt->execute([$name]);
+            }
+            if ($check_stmt->fetch()) {
+                $error = 'Услуга с таким названием уже существует';
+            } else {
+                if ($is_edit) {
+                    $stmt = $pdo->prepare("UPDATE services SET name = ?, description = ?, price = ?, duration = ?, category = ?, trainer_id = ?, schedule = ?, max_participants = ?, is_active = ? WHERE id = ?");
+                    $stmt->execute([$name, $description, $price, $duration, $category, $trainer_id, $schedule, $max_participants, $is_active, $id]);
+                    $message = 'Услуга успешно обновлена';
+                } else {
+                    // Случайный рейтинг от 1 до 5 для новой услуги
+                    $rating = rand(1, 5);
+                    $stmt = $pdo->prepare("INSERT INTO services (name, description, price, duration, category, trainer_id, schedule, max_participants, is_active, rating) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([$name, $description, $price, $duration, $category, $trainer_id, $schedule, $max_participants, $is_active, $rating]);
+                    $message = 'Услуга успешно создана';
+                    $is_edit = true;
+                    $id = $pdo->lastInsertId();
+                }
             }
         } catch (PDOException $e) {
-            $error = 'Ошибка при сохранении услуги';
+            // Проверяем, не ошибка ли это дубликата уникального ключа
+            if ($e->getCode() == 23000 || strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                $error = 'Услуга с таким названием уже существует';
+            } else {
+                $error = 'Ошибка при сохранении услуги';
+            }
             error_log("Service edit error: " . $e->getMessage());
         }
     }

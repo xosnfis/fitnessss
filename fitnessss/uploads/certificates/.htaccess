@@ -1,0 +1,16 @@
+# Защита папки certificates
+# Разрешаем доступ только к файлам изображений
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|jfif)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Запрещаем выполнение PHP файлов
+<FilesMatch "\.php$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Запрещаем листинг директории
+Options -Indexes
+

@@ -161,6 +161,22 @@ try {
             </div>
         </div>
     </div>
+    <div class="col-md-6 col-lg-4 mb-4 fade-in-on-scroll">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="me-3" style="font-size: 2.5rem; color: var(--primary-color);">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Управление сертификатами</h5>
+                </div>
+                <p class="card-text">Загрузка и управление сертификатами фитнес-центра</p>
+                <a href="certificates.php" class="btn btn-primary w-100">
+                    <i class="fas fa-arrow-right me-2"></i>Перейти
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php include 'includes/footer.php'; ?>

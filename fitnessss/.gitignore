@@ -1,35 +1,26 @@
-# Игнорируемые файлы
+# Конфигурация базы данных (содержит пароли)
+config/database.php
 
-# Конфигурация БД (может содержать пароли)
-config/database.local.php
-
-# Логи
-*.log
-logs/
+# Резервные копии БД
+database/backups/*.sql
 
 # Временные файлы
+*.log
 *.tmp
-*.temp
-.DS_Store
-Thumbs.db
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-
-# Временные файлы PHP
 *.cache
 
-# Загрузки пользователей (если будут)
-uploads/
+# Загруженные файлы (опционально, если не нужны в репозитории)
+# uploads/certificates/*
+# uploads/trainers/*
 
-# Node modules (если будут использоваться)
-node_modules/
+# Системные файлы
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
 
-# Composer
-vendor/
-composer.lock
+# Тесты
+tests/
 
+# Служебные файлы (после развертывания)
+check_requirements.php

@@ -1,0 +1,48 @@
+<?php
+// Конфигурация базы данных
+// Скопируйте этот файл в database.php и заполните своими данными
+
+// Для локальной разработки
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'fitness_center');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_CHARSET', 'utf8mb4');
+
+// Для хостинга (замените на данные от хостинга):
+// define('DB_HOST', 'localhost'); // или IP адрес сервера БД
+// define('DB_NAME', 'your_database_name');
+// define('DB_USER', 'your_database_user');
+// define('DB_PASS', 'your_database_password');
+// define('DB_CHARSET', 'utf8mb4');
+
+// Альтернатива: использование переменных окружения (если поддерживается хостингом)
+// define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+// define('DB_NAME', getenv('DB_NAME') ?: 'fitness_center');
+// define('DB_USER', getenv('DB_USER') ?: 'root');
+// define('DB_PASS', getenv('DB_PASS') ?: '');
+// define('DB_CHARSET', 'utf8mb4');
+
+// Функция подключения к базе данных
+function getDBConnection() {
+    static $pdo = null;
+    
+    if ($pdo === null) {
+        try {
+            $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
+            $options = [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+            ];
+            $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+        } catch (PDOException $e) {
+            error_log("Database connection error: " . $e->getMessage());
+            die("Ошибка подключения к базе данных. Пожалуйста, попробуйте позже.");
+        }
+    }
+    
+    return $pdo;
+}
+?>
+

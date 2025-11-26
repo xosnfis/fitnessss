@@ -189,7 +189,7 @@ try {
             <?php
             // Показываем активные подписки пользователя
             try {
-                $stmt = $pdo->prepare("SELECT us.*, s.name as subscription_name, s.price as subscription_price 
+                $stmt = $pdo->prepare("SELECT us.*, s.name as subscription_name, s.price as subscription_price, s.visits_count 
                                       FROM user_subscriptions us 
                                       INNER JOIN subscriptions s ON us.subscription_id = s.id 
                                       WHERE us.user_id = ? AND us.is_active = 1 AND us.end_date >= CURDATE() 
@@ -214,11 +214,17 @@ try {
                                     Действует до: <?php echo date('d.m.Y', strtotime($sub['end_date'])); ?>
                                 </p>
                                 <?php if ($sub['visits_count']): ?>
-                                    <p class="mb-0 text-muted small">
+                                    <p class="mb-1 text-muted small">
                                         <i class="fas fa-ticket-alt me-1"></i>
                                         Использовано посещений: <?php echo $sub['visits_used']; ?> / <?php echo $sub['visits_count']; ?>
                                     </p>
                                 <?php endif; ?>
+                                <div class="mt-2">
+                                    <button class="btn btn-danger btn-sm" 
+                                            onclick="cancelSubscription(<?php echo $sub['id']; ?>, '<?php echo htmlspecialchars($sub['subscription_name'], ENT_QUOTES); ?>')">
+                                        <i class="fas fa-times me-1"></i>Отменить абонемент
+                                    </button>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -236,5 +242,77 @@ try {
         <i class="fas fa-exclamation-circle me-2"></i>Ошибка загрузки профиля
     </div>
 <?php endif; ?>
+
+<script>
+function cancelSubscription(subscriptionId, subscriptionName) {
+    // Подтверждение отмены
+    if (!confirm('Вы уверены, что хотите отменить абонемент "' + subscriptionName + '"?\n\nПосле отмены вы сможете приобрести новый абонемент.')) {
+        return;
+    }
+    
+    // Создаем форму для отправки POST запроса
+    const formData = new FormData();
+    formData.append('subscription_id', subscriptionId);
+    
+    // Показываем индикатор загрузки
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Отмена...';
+    
+    // Отправляем запрос
+    fetch('api/cancel_subscription.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Показываем уведомление об успехе
+            showNotification('Абонемент успешно отменен', 'success');
+            
+            // Перезагружаем страницу через небольшую задержку
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            // Показываем ошибку
+            showNotification(data.message || 'Ошибка при отмене абонемента', 'error');
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Произошла ошибка при отмене абонемента', 'error');
+        button.disabled = false;
+        button.innerHTML = originalText;
+    });
+}
+
+// Функция для показа уведомлений (если не определена в main.js)
+function showNotification(message, type = 'info') {
+    // Проверяем, есть ли функция showNotification из main.js
+    if (typeof window.showNotification === 'function') {
+        window.showNotification(message, type);
+        return;
+    }
+    
+    // Если нет, создаем простое уведомление
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    document.body.appendChild(notification);
+    
+    // Автоматически удаляем через 5 секунд
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}
+</script>
 
 <?php include 'includes/footer.php'; ?>

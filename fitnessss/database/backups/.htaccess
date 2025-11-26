@@ -1,0 +1,13 @@
+# Защита папки backups
+# Запрещаем прямой доступ к файлам резервных копий
+Order Deny,Allow
+Deny from all
+
+# Разрешаем доступ только через скрипт backup.php
+<FilesMatch "backup\.php$">
+    Allow from all
+</FilesMatch>
+
+# Запрещаем листинг директории
+Options -Indexes
+
